@@ -1,0 +1,4 @@
+include ':app'
+include ':hooker'
+include ':libxhook'
+rootProject.name = "InlineHookTest"
