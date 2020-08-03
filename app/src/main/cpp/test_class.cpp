@@ -9,6 +9,7 @@ void TestClass::setField(int field) {
     this->field = field;
 }
 
-void TestClass::printValue(int value) {
+void *TestClass::printValue(int value) {
     LOGD("printValue value=%u", value);
+    return (void*)"printValue";
 }

@@ -9,6 +9,6 @@ private:
     int field;
 public:
     void setField(int field);
-    void printValue(int value);
+    void *printValue(int value);
 };
 #endif //INLINEHOOKTEST_TESTCLASS_H

@@ -38,7 +38,7 @@
 
 #include <unistd.h>
 
-#if defined(__aarch64__)
+//#if defined(__aarch64__)
 
 #include "And64InlineHook.hpp"
 
@@ -432,6 +432,7 @@ static void __fix_instructions(uint32_t *__restrict inp, int32_t count, uint32_t
         ctx.process_fix_map(ctx.get_and_set_current_index(inp, outp));
         *(outp++) = *(inp++);
     }
+    A64_LOGI("__fix_instructions outp=%p", outp);
 
     static constexpr uint_fast64_t mask = 0x03ffffffu; // 0b00000011111111111111111111111111
     auto callback  = reinterpret_cast<int64_t>(inp);
@@ -485,7 +486,6 @@ class A64HookInit {
 public:
     A64HookInit() {
         __make_rwx(__insns_pool, sizeof(__insns_pool));
-        A64_LOGI("insns pool initialized.");
     }
 };
 static A64HookInit __init;
@@ -594,7 +594,7 @@ A64_JNIEXPORT void A64HookFunction(void *const symbol, void *const replace, void
             return;
         }
         *result = trampoline;
-        __flush_cache(result, 5 * sizeof(uint32_t));
+//        __flush_cache(result, 5 * sizeof(uint32_t));
         if (trampoline == NULL) return;
     } //if
     A64_LOGI("A64HookFunction -> 2");
@@ -607,4 +607,4 @@ A64_JNIEXPORT void A64HookFunction(void *const symbol, void *const replace, void
 }
 }
 
-#endif // defined(__aarch64__)
+//#endif // defined(__aarch64__)

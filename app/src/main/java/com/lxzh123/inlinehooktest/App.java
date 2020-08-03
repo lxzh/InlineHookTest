@@ -34,7 +34,7 @@ public class App extends Application {
             public void run() {
                 super.run();
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(2500);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

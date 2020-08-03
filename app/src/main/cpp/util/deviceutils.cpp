@@ -94,274 +94,274 @@ char *get_open_function_flag() {
 #endif
     return "";
 }
-
-//64位
-/////////////////////
-//#if defined(__LP64__) || defined(__aarch64__) || defined(__x86_64__) || defined(__x86_64) || defined(__arm__)
-static void *
-(*old_arm64_open_common)(uint8_t *, size_t, void *, uint32_t, void *, bool, bool, void *, void *);
-
-static void *new_arm64_open_common(uint8_t *base, size_t size, void *location,
-                                   uint32_t location_checksum, void *oat_dex_file,
-                                   bool verify,
-                                   bool verify_checksum,
-                                   void *error_meessage, void *verify_result) {
-    LOGI("new_arm64_open_common base=%u, size=%u, location=%u, location_checksum=%u", base,
-         size, location, location_checksum);
-    if (size < DEX_MIN_LEN) {
-        LOGE("size=%u", size);
-    } else {
-        save_dex_file(base, size);
-    }
-    void *result = old_arm64_open_common(base, size, location, location_checksum,
-                                         oat_dex_file, verify, verify_checksum,
-                                         error_meessage,
-                                         verify_result);
-    return result;
-}
-
-static void *
-(*old_arm64_q_open_common)(uint8_t *, size_t, const uint8_t *, size_t, void *,
-                           uint32_t, void *,
-                           bool,
-                           bool,
-                           void *,
-                           void *,
-                           void *);
-
-static void *
-new_arm64_q_open_common(uint8_t *base, size_t size, const uint8_t *data_base, size_t data_size,
-                        void *location, uint32_t location_checksum,
-                        void *oat_dex_file,
-                        bool verify,
-                        bool verify_checksum,
-                        void *error_msg,
-                        void *container,
-                        void *verify_result) {
-    LOGI("new_arm64_q_open_common enter");
-    LOGI("new_arm64_q_open_common base=%p, size=%u, data_base=%p, data_size=%u, location=%u, "
-         "location_checksum=%u, oat_dex_file=%u, verify=%u, verify_checksum=%u, DEX_MIN_LEN=%u", base, size,
-         data_base, data_size, location, location_checksum, oat_dex_file, verify, verify_checksum, DEX_MIN_LEN);
-    if (size < DEX_MIN_LEN) {
-        LOGE("size=%u", size);
-    } else {
-        save_dex_file(base, size);
-    }
-    return (*old_arm64_q_open_common)(base, size, data_base, data_size, location,
-                                           location_checksum,
-                                           oat_dex_file, verify, verify_checksum,
-                                           error_msg, container,
-                                           verify_result);
-    LOGI("new_arm64_q_open_common out");
+//
+////64位
+///////////////////////
+////#if defined(__LP64__) || defined(__aarch64__) || defined(__x86_64__) || defined(__x86_64) || defined(__arm__)
+//static void *
+//(*old_arm64_open_common)(uint8_t *, size_t, void *, uint32_t, void *, bool, bool, void *, void *);
+//
+//static void *new_arm64_open_common(uint8_t *base, size_t size, void *location,
+//                                   uint32_t location_checksum, void *oat_dex_file,
+//                                   bool verify,
+//                                   bool verify_checksum,
+//                                   void *error_meessage, void *verify_result) {
+//    LOGI("new_arm64_open_common base=%u, size=%u, location=%u, location_checksum=%u", base,
+//         size, location, location_checksum);
+//    if (size < DEX_MIN_LEN) {
+//        LOGE("size=%u", size);
+//    } else {
+//        save_dex_file(base, size);
+//    }
+//    void *result = old_arm64_open_common(base, size, location, location_checksum,
+//                                         oat_dex_file, verify, verify_checksum,
+//                                         error_meessage,
+//                                         verify_result);
 //    return result;
-//    return NULL;
-}
-
-static void *
-(*old_x64_q_open_common)(void *DexFile_thiz, uint8_t *, size_t, const uint8_t *,
-                             size_t, void *,
-                             uint32_t, void *,
-                             bool,
-                             bool,
-                             void *,
-                             void *,
-                             void *);
-static void *new_x64_q_open_common(void *DexFile_thiz, uint8_t *base, size_t size, const uint8_t *data_base,
-                                       size_t data_size, void *location,
-                                       uint32_t location_checksum, void *oat_dex_file,
-                                       bool verify,
-                                       bool verify_checksum,
-                                       void *error_msg,
-                                       void *container,
-                                       void *verify_result) {
-    LOGI("new_x64_q_open_common enter");
-    LOGI("new_x64_q_open_common DexFile_thiz=%p, base=%p, size=%u, data_base=%p, data_size=%u, location=%u, "
-         "location_checksum=%u, oat_dex_file=%u, verify=%u, verify_checksum=%u", DexFile_thiz, base, size,
-         data_base, data_size, location, location_checksum, oat_dex_file, verify, verify_checksum);
-    if (size < DEX_MIN_LEN) {
-        LOGE("size=%u", size);
-    } else {
-        save_dex_file(base, size);
-    }
-    return (*old_x64_q_open_common)(DexFile_thiz, base, size, data_base, data_size, location,
-                                         location_checksum,
-                                         oat_dex_file, verify, verify_checksum,
-                                         error_msg, container,
-                                         verify_result);
-    LOGI("new_x64_q_open_common out");
-//    return result;
-//    return NULL;
-}
-/////////////////////
-
-
-
-/////////////////////
-static void *(*old_arm64_open_memory)(uint8_t *base,
-                                      size_t size, void *location,
-                                      uint32_t location_checksum,
-                                      void *mem_map,
-                                      void *oat_dex_file, void *error_msg);
-
-static void *
-(new_arm64_open_memory)(uint8_t *base, size_t size, void *location,
-                        uint32_t location_checksum, void *mem_map,
-                        void *oat_dex_file, void *error_msg) {
-    LOGI("new_arm64_open_memory base=%p, size=%u, location=%p, location_checksum=%u", base,
-         size, location, location_checksum);
-    if (size > DEX_MIN_LEN) {
-        save_dex_file(base, size);
-    }
-//    return NULL;
-    return (*old_arm64_open_memory)(base, size, location, location_checksum, mem_map,
-                                    oat_dex_file, error_msg);
-}
-/////////////////////
-
-//32位
+//}
+//
+//static void *
+//(*old_arm64_q_open_common)(uint8_t *, size_t, const uint8_t *, size_t, void *,
+//                           uint32_t, void *,
+//                           bool,
+//                           bool,
+//                           void *,
+//                           void *,
+//                           void *);
+//
+//static void *
+//new_arm64_q_open_common(uint8_t *base, size_t size, const uint8_t *data_base, size_t data_size,
+//                        void *location, uint32_t location_checksum,
+//                        void *oat_dex_file,
+//                        bool verify,
+//                        bool verify_checksum,
+//                        void *error_msg,
+//                        void *container,
+//                        void *verify_result) {
+//    LOGI("new_arm64_q_open_common enter");
+//    LOGI("new_arm64_q_open_common base=%p, size=%u, data_base=%p, data_size=%u, location=%u, "
+//         "location_checksum=%u, oat_dex_file=%u, verify=%u, verify_checksum=%u, DEX_MIN_LEN=%u", base, size,
+//         data_base, data_size, location, location_checksum, oat_dex_file, verify, verify_checksum, DEX_MIN_LEN);
+//    if (size < DEX_MIN_LEN) {
+//        LOGE("size=%u", size);
+//    } else {
+//        save_dex_file(base, size);
+//    }
+//    return (*old_arm64_q_open_common)(base, size, data_base, data_size, location,
+//                                           location_checksum,
+//                                           oat_dex_file, verify, verify_checksum,
+//                                           error_msg, container,
+//                                           verify_result);
+//    LOGI("new_arm64_q_open_common out");
+////    return result;
+////    return NULL;
+//}
+//
+//static void *
+//(*old_x64_q_open_common)(void *DexFile_thiz, uint8_t *, size_t, const uint8_t *,
+//                             size_t, void *,
+//                             uint32_t, void *,
+//                             bool,
+//                             bool,
+//                             void *,
+//                             void *,
+//                             void *);
+//static void *new_x64_q_open_common(void *DexFile_thiz, uint8_t *base, size_t size, const uint8_t *data_base,
+//                                       size_t data_size, void *location,
+//                                       uint32_t location_checksum, void *oat_dex_file,
+//                                       bool verify,
+//                                       bool verify_checksum,
+//                                       void *error_msg,
+//                                       void *container,
+//                                       void *verify_result) {
+//    LOGI("new_x64_q_open_common enter");
+//    LOGI("new_x64_q_open_common DexFile_thiz=%p, base=%p, size=%u, data_base=%p, data_size=%u, location=%u, "
+//         "location_checksum=%u, oat_dex_file=%u, verify=%u, verify_checksum=%u", DexFile_thiz, base, size,
+//         data_base, data_size, location, location_checksum, oat_dex_file, verify, verify_checksum);
+//    if (size < DEX_MIN_LEN) {
+//        LOGE("size=%u", size);
+//    } else {
+//        save_dex_file(base, size);
+//    }
+//    return (*old_x64_q_open_common)(DexFile_thiz, base, size, data_base, data_size, location,
+//                                         location_checksum,
+//                                         oat_dex_file, verify, verify_checksum,
+//                                         error_msg, container,
+//                                         verify_result);
+//    LOGI("new_x64_q_open_common out");
+////    return result;
+////    return NULL;
+//}
+///////////////////////
+//
+//
+//
+///////////////////////
+//static void *(*old_arm64_open_memory)(uint8_t *base,
+//                                      size_t size, void *location,
+//                                      uint32_t location_checksum,
+//                                      void *mem_map,
+//                                      void *oat_dex_file, void *error_msg);
+//
+//static void *
+//(new_arm64_open_memory)(uint8_t *base, size_t size, void *location,
+//                        uint32_t location_checksum, void *mem_map,
+//                        void *oat_dex_file, void *error_msg) {
+//    LOGI("new_arm64_open_memory base=%p, size=%u, location=%p, location_checksum=%u", base,
+//         size, location, location_checksum);
+//    if (size > DEX_MIN_LEN) {
+//        save_dex_file(base, size);
+//    }
+////    return NULL;
+//    return (*old_arm64_open_memory)(base, size, location, location_checksum, mem_map,
+//                                    oat_dex_file, error_msg);
+//}
+///////////////////////
+//
+////32位
+////#else
+//
+///////////////////////
+//static void *
+//(*old_nougat_open_memory)(void *DexFile_thiz, uint8_t *base, size_t size, void *location,
+//                          uint32_t location_checksum, void *mem_map, void *oat_dex_file,
+//                          void *error_msg);
+//
+//static void *
+//(new_nougat_open_memory)(void *DexFile_thiz, uint8_t *base, size_t size, void *location,
+//                         uint32_t location_checksum, void *mem_map, void *oat_dex_file,
+//                         void *error_msg) {
+//    LOGI("new_nougat_open_memory DexFile_thiz=%u base=%u, size=%u, location=%u, location_checksum=%u, oat_dex_file=%u",
+//            (uint32_t)DexFile_thiz, base, size, location, location_checksum, (uint32_t)oat_dex_file);
+//    if (size > DEX_MIN_LEN) {
+//        save_dex_file(base, size);
+//    }
+//    return (*old_nougat_open_memory)(DexFile_thiz, base, size, location, location_checksum, mem_map,
+//                                     oat_dex_file, error_msg);
+//}
+///////////////////////
+//
+///////////////////////
+//static void *(*old_opencommon)(void *DexFile_thiz, uint8_t *base, size_t size, void *location,
+//                               uint32_t location_checksum, void *oat_dex_file, bool verify,
+//                               bool verify_checksum,
+//                               void *error_meessage, void *verify_result);
+//
+//
+//static void *new_opencommon(void *DexFile_thiz, uint8_t *base, size_t size, void *location,
+//                            uint32_t location_checksum, void *oat_dex_file, bool verify,
+//                            bool verify_checksum,
+//                            void *error_meessage, void *verify_result) {
+//    LOGI("new_opencommon DexFile_thiz=%u base=%u, size=%u, location=%u, location_checksum=%u",
+//            (uint32_t)DexFile_thiz, base, size, location, location_checksum);
+//    if (size > DEX_MIN_LEN) {
+//        save_dex_file(base, size);
+//    }
+//    return (*old_opencommon)(DexFile_thiz, base, size, location, location_checksum,
+//                             oat_dex_file, verify, verify_checksum, error_meessage,
+//                             verify_result);
+//}
+///////////////////////
+//
+//
+//static void *(*old_pie_open_memory)(void *DexFile_thiz,
+//                                    uint8_t *base,
+//                                    size_t size,
+//                                    uint8_t *data_base,
+//                                    size_t data_size,
+//                                    void *location,
+//                                    uint32_t location_checksum,
+//                                    void *oat_dex_file,
+//                                    bool verify,
+//                                    bool verify_checksum,
+//                                    void *error_msg,
+//                                    void *container,
+//                                    void *verify_result);
+//
+//static void *(new_pie_open_memory)(void *DexFile_thiz,
+//                                   uint8_t *base,
+//                                   size_t size,
+//                                   uint8_t *data_base,
+//                                   size_t data_size,
+//                                   void *location,
+//                                   uint32_t location_checksum,
+//                                   void *oat_dex_file,
+//                                   bool verify,
+//                                   bool verify_checksum,
+//                                   void *error_msg,
+//                                   void *container,
+//                                   void *verify_result) {
+//    LOGI("new_pie_open_memory DexFile_thiz=%u base=%u, size=%u, location=%u, location_checksum=%u",
+//            (uint32_t)DexFile_thiz, base, size, location, location_checksum);
+//    if (size > DEX_MIN_LEN) {
+//        save_dex_file(base, size);
+//    }
+//    return (*old_pie_open_memory)(DexFile_thiz,
+//                                  base,
+//                                  size,
+//                                  data_base,
+//                                  data_size,
+//                                  location,
+//                                  location_checksum,
+//                                  oat_dex_file,
+//                                  verify,
+//                                  verify_checksum,
+//                                  error_msg,
+//                                  container,
+//                                  verify_result);
+//}
+////#endif
+//
+//void **get_old_open_function_addr() {
+//#if defined(__LP64__) || defined(__aarch64__) || defined(__x86_64__) || defined(__x86_64)
+//        if (is_oreo()) {
+//            return reinterpret_cast<void **>(&old_arm64_open_common);
+//        } else if(is_q()) {
+//            if (is_arm_64()) {
+//                return reinterpret_cast<void **>(&old_arm64_q_open_common);
+//            } else {
+//                return reinterpret_cast<void **>(&old_x64_q_open_common);
+//            }
+//        } else {
+//            return reinterpret_cast<void **>(&old_arm64_open_memory);
+//        }
+//#elif defined(__arm__)
+//    return reinterpret_cast<void **>(old_x64_q_open_common);
 //#else
-
-/////////////////////
-static void *
-(*old_nougat_open_memory)(void *DexFile_thiz, uint8_t *base, size_t size, void *location,
-                          uint32_t location_checksum, void *mem_map, void *oat_dex_file,
-                          void *error_msg);
-
-static void *
-(new_nougat_open_memory)(void *DexFile_thiz, uint8_t *base, size_t size, void *location,
-                         uint32_t location_checksum, void *mem_map, void *oat_dex_file,
-                         void *error_msg) {
-    LOGI("new_nougat_open_memory DexFile_thiz=%u base=%u, size=%u, location=%u, location_checksum=%u, oat_dex_file=%u",
-            (uint32_t)DexFile_thiz, base, size, location, location_checksum, (uint32_t)oat_dex_file);
-    if (size > DEX_MIN_LEN) {
-        save_dex_file(base, size);
-    }
-    return (*old_nougat_open_memory)(DexFile_thiz, base, size, location, location_checksum, mem_map,
-                                     oat_dex_file, error_msg);
-}
-/////////////////////
-
-/////////////////////
-static void *(*old_opencommon)(void *DexFile_thiz, uint8_t *base, size_t size, void *location,
-                               uint32_t location_checksum, void *oat_dex_file, bool verify,
-                               bool verify_checksum,
-                               void *error_meessage, void *verify_result);
-
-
-static void *new_opencommon(void *DexFile_thiz, uint8_t *base, size_t size, void *location,
-                            uint32_t location_checksum, void *oat_dex_file, bool verify,
-                            bool verify_checksum,
-                            void *error_meessage, void *verify_result) {
-    LOGI("new_opencommon DexFile_thiz=%u base=%u, size=%u, location=%u, location_checksum=%u",
-            (uint32_t)DexFile_thiz, base, size, location, location_checksum);
-    if (size > DEX_MIN_LEN) {
-        save_dex_file(base, size);
-    }
-    return (*old_opencommon)(DexFile_thiz, base, size, location, location_checksum,
-                             oat_dex_file, verify, verify_checksum, error_meessage,
-                             verify_result);
-}
-/////////////////////
-
-
-static void *(*old_pie_open_memory)(void *DexFile_thiz,
-                                    uint8_t *base,
-                                    size_t size,
-                                    uint8_t *data_base,
-                                    size_t data_size,
-                                    void *location,
-                                    uint32_t location_checksum,
-                                    void *oat_dex_file,
-                                    bool verify,
-                                    bool verify_checksum,
-                                    void *error_msg,
-                                    void *container,
-                                    void *verify_result);
-
-static void *(new_pie_open_memory)(void *DexFile_thiz,
-                                   uint8_t *base,
-                                   size_t size,
-                                   uint8_t *data_base,
-                                   size_t data_size,
-                                   void *location,
-                                   uint32_t location_checksum,
-                                   void *oat_dex_file,
-                                   bool verify,
-                                   bool verify_checksum,
-                                   void *error_msg,
-                                   void *container,
-                                   void *verify_result) {
-    LOGI("new_pie_open_memory DexFile_thiz=%u base=%u, size=%u, location=%u, location_checksum=%u",
-            (uint32_t)DexFile_thiz, base, size, location, location_checksum);
-    if (size > DEX_MIN_LEN) {
-        save_dex_file(base, size);
-    }
-    return (*old_pie_open_memory)(DexFile_thiz,
-                                  base,
-                                  size,
-                                  data_base,
-                                  data_size,
-                                  location,
-                                  location_checksum,
-                                  oat_dex_file,
-                                  verify,
-                                  verify_checksum,
-                                  error_msg,
-                                  container,
-                                  verify_result);
-}
-//#endif
-
-void **get_old_open_function_addr() {
-#if defined(__LP64__) || defined(__aarch64__) || defined(__x86_64__) || defined(__x86_64)
-        if (is_oreo()) {
-            return reinterpret_cast<void **>(&old_arm64_open_common);
-        } else if(is_q()) {
-            if (is_arm_64()) {
-                return reinterpret_cast<void **>(&old_arm64_q_open_common);
-            } else {
-                return reinterpret_cast<void **>(&old_x64_q_open_common);
-            }
-        } else {
-            return reinterpret_cast<void **>(&old_arm64_open_memory);
-        }
-#elif defined(__arm__)
-    return reinterpret_cast<void **>(old_x64_q_open_common);
-#else
-        if (is_oreo()) {
-            return reinterpret_cast<void **>(&old_opencommon);
-        } else {
-            if (is_pie() || is_q()) {
-                return reinterpret_cast<void **>(&old_pie_open_memory);
-            }
-            return reinterpret_cast<void **>(&old_nougat_open_memory);
-        }
-#endif
-}
-
-void *get_new_open_function_addr() {
-    LOGI("get_new_open_function_addr is_arm_64=%u, is_marshmallow=%u, is_nougat=%u, is_oreo=%u, is_pie=%u, is_q=%u, is_r=%u",
-         is_arm_64(), is_marshmallow(), is_nougat(), is_oreo(), is_pie(), is_q(), is_r());
-#if defined(__LP64__) || defined(__aarch64__) || defined(__x86_64__) || defined(__x86_64)
-        if (is_oreo()) {
-            return reinterpret_cast<void *>(new_arm64_open_common);
-        } else if (is_q()) {
-            if (is_arm_64()) {
-                return reinterpret_cast<void **>(&new_arm64_q_open_common);
-            } else {
-                return reinterpret_cast<void *>(new_x64_q_open_common);
-            }
-        }
-//        else if (is_oreo()) {
-//            return reinterpret_cast<void *>(new_opencommon);
+//        if (is_oreo()) {
+//            return reinterpret_cast<void **>(&old_opencommon);
 //        } else {
 //            if (is_pie() || is_q()) {
-//                return reinterpret_cast<void *>(new_pie_open_memory);
+//                return reinterpret_cast<void **>(&old_pie_open_memory);
 //            }
-//            return reinterpret_cast<void *>(new_nougat_open_memory);
+//            return reinterpret_cast<void **>(&old_nougat_open_memory);
 //        }
-#elif defined(__arm__)
-    return reinterpret_cast<void *>(new_x64_q_open_common);
-#endif
-    return NULL;
-}
+//#endif
+//}
+//
+//void *get_new_open_function_addr() {
+//    LOGI("get_new_open_function_addr is_arm_64=%u, is_marshmallow=%u, is_nougat=%u, is_oreo=%u, is_pie=%u, is_q=%u, is_r=%u",
+//         is_arm_64(), is_marshmallow(), is_nougat(), is_oreo(), is_pie(), is_q(), is_r());
+//#if defined(__LP64__) || defined(__aarch64__) || defined(__x86_64__) || defined(__x86_64)
+//        if (is_oreo()) {
+//            return reinterpret_cast<void *>(new_arm64_open_common);
+//        } else if (is_q()) {
+//            if (is_arm_64()) {
+//                return reinterpret_cast<void **>(&new_arm64_q_open_common);
+//            } else {
+//                return reinterpret_cast<void *>(new_x64_q_open_common);
+//            }
+//        }
+////        else if (is_oreo()) {
+////            return reinterpret_cast<void *>(new_opencommon);
+////        } else {
+////            if (is_pie() || is_q()) {
+////                return reinterpret_cast<void *>(new_pie_open_memory);
+////            }
+////            return reinterpret_cast<void *>(new_nougat_open_memory);
+////        }
+//#elif defined(__arm__)
+//    return reinterpret_cast<void *>(new_x64_q_open_common);
+//#endif
+//    return NULL;
+//}

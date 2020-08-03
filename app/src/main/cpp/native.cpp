@@ -147,10 +147,10 @@ void new_print(const char *str) {
     old_print(str);
 }
 
-void (*old_cppprint)(void *testClass, int value);
-void new_cppprint(void *testClass, int value) {
+void *(*old_cppprint)(void *testClass, int value);
+void *new_cppprint(void *testClass, int value) {
     LOGD("new_cppprint value=%u %p", value, testClass);
-    old_cppprint(testClass, value);
+    return old_cppprint(testClass, value);
 }
 
 void hookPrint() {
@@ -198,10 +198,10 @@ int unhookPrint() {
 void hookTest() {
     TestClass testClass;
     myprint("test");
-    testClass.printValue(1);
+    LOGD("printValue1:%s", (char *)testClass.printValue(1));
     hookPrint();
     myprint("test");
-    testClass.printValue(2);
+    LOGD("printValue1:%s", (char *)testClass.printValue(2));
 //    unhookPrint();
 //    myprint("test");
 }
@@ -219,8 +219,8 @@ JNIEXPORT void JNICALL hook(JNIEnv *env, jclass obj) {
     is_hook = true;
 }
 
-void *
-(*old_x64_q_open_common)(void *DexFile_thiz, uint8_t *, size_t, const uint8_t *,
+#ifdef __aarch64__
+void *(*old_q_open_common)(uint8_t *, size_t, const uint8_t *,
                          size_t, void *,
                          uint32_t, void *,
                          bool,
@@ -228,7 +228,7 @@ void *
                          void *,
                          void *,
                          void *);
-void *new_x64_q_open_common(void *DexFile_thiz, uint8_t *base, size_t size, const uint8_t *data_base,
+void *new_q_open_common(uint8_t *base, size_t size, const uint8_t *data_base,
                                    size_t data_size, void *location,
                                    uint32_t location_checksum, void *oat_dex_file,
                                    bool verify,
@@ -236,8 +236,41 @@ void *new_x64_q_open_common(void *DexFile_thiz, uint8_t *base, size_t size, cons
                                    void *error_msg,
                                    void *container,
                                    void *verify_result) {
-    LOGI("new_x64_q_open_common enter");
-    LOGI("new_x64_q_open_common DexFile_thiz=%p, base=%p, size=%u, data_base=%p, data_size=%u, location=%u, "
+    LOGI("new_q_open_common enter");
+    LOGI("new_q_open_common base=%p, size=%p, data_base=%p, data_size=%u, location=%p, "
+         "location_checksum=%u, oat_dex_file=%u, verify=%u, verify_checksum=%u", base, size,
+         data_base, data_size, location, location_checksum, oat_dex_file, verify, verify_checksum);
+//    if (size < 1024) {
+//        LOGE("size=%u", size);
+//    } else {
+//        save_dex_file(base, size);
+//    }
+    return old_q_open_common(base, size, data_base, data_size, location,
+                                    location_checksum,
+                                    oat_dex_file, verify, verify_checksum,
+                                    error_msg, container,
+                                    verify_result);
+}
+#else
+void *
+(*old_q_open_common)(void *DexFile_thiz, uint8_t *, size_t, const uint8_t *,
+                             size_t, void *,
+                             uint32_t, void *,
+                             bool,
+                             bool,
+                             void *,
+                             void *,
+                             void *);
+void *new_q_open_common(void *DexFile_thiz, uint8_t *base, size_t size, const uint8_t *data_base,
+                                       size_t data_size, void *location,
+                                       uint32_t location_checksum, void *oat_dex_file,
+                                       bool verify,
+                                       bool verify_checksum,
+                                       void *error_msg,
+                                       void *container,
+                                       void *verify_result) {
+    LOGI("new_q_open_common enter");
+    LOGI("new_q_open_common DexFile_thiz=%p, base=%p, size=%p, data_base=%p, data_size=%u, location=%p, "
          "location_checksum=%u, oat_dex_file=%u, verify=%u, verify_checksum=%u", DexFile_thiz, base, size,
          data_base, data_size, location, location_checksum, oat_dex_file, verify, verify_checksum);
 //    if (size < 1024) {
@@ -245,12 +278,13 @@ void *new_x64_q_open_common(void *DexFile_thiz, uint8_t *base, size_t size, cons
 //    } else {
 //        save_dex_file(base, size);
 //    }
-    return (*old_x64_q_open_common)(DexFile_thiz, base, size, data_base, data_size, location,
-                                    location_checksum,
-                                    oat_dex_file, verify, verify_checksum,
-                                    error_msg, container,
-                                    verify_result);
+    return old_q_open_common(DexFile_thiz, base, size, data_base, data_size, location,
+                                         location_checksum,
+                                         oat_dex_file, verify, verify_checksum,
+                                         error_msg, container,
+                                         verify_result);
 }
+#endif
 
 JNIEXPORT void JNICALL dump(JNIEnv *env, jclass obj, jstring packageName) {
     LOGD("hook start");
@@ -282,15 +316,14 @@ JNIEXPORT void JNICALL dump(JNIEnv *env, jclass obj, jstring packageName) {
         LOGD("Error: unable to find the Symbol:%s", symbol_name);
         return;
     }
-//    printMaps();
     LOGD("loaded so finished, start hook");
-    void *new_func_addr = get_new_open_function_addr();
-    void **old_func_addr = get_old_open_function_addr();
-    LOGD("hook new_func_addr=%p, old_func_addr=%p", new_func_addr, old_func_addr);
+//    void *new_func_addr = get_new_open_function_addr();
+//    void **old_func_addr = get_old_open_function_addr();
+//    LOGD("hook new_func_addr=%p, old_func_addr=%p", new_func_addr, old_func_addr);
 //    hook_function(open_common_addr, new_func_addr, old_func_addr);
 
-    hook_function(open_common_addr, (void *)new_x64_q_open_common, (void **)&old_x64_q_open_common);
-
+    hook_function(open_common_addr, (void *)new_q_open_common, (void **)&old_q_open_common);
+    printMaps();
 
     LOGD("hook init complete");
     is_hook = true;
