@@ -18,9 +18,13 @@ android {
 //                cppFlags "-std=c++11 -fno-rtti -fno-exceptions"
 //                arguments '-DANDROID_PLATFORM=android-16',
 //                        '-DANDROID_TOOLCHAIN=clang', '-DANDROID_STL=none'
-//                abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
+//                abiFilters 'armeabi-v7a', 'x86', 'x86_64'
                 cppFlags "-std=c++14","-fms-extensions"
-                abiFilters 'arm64-v8a', 'armeabi-v7a'
+//                abiFilters 'arm64-v8a', 'armeabi-v7a'
+            }
+            ndk {
+//            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+                abiFilters 'armeabi-v7a', 'x86', 'x86_64'
             }
         }
     }
@@ -43,7 +47,7 @@ dependencies {
 //    implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation project(path: ':hooker')
+//    implementation project(path: ':hooker')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'

@@ -7,7 +7,8 @@
 #include "fileutils.h"
 #include "common.h"
 
-const static long DEX_MIN_LEN = 102400L;
+//const static long DEX_MIN_LEN = 102400L;
+const static long DEX_MIN_LEN = 1024L;
 static int sdk_int = 0;
 
 void init_sdk_init() {
@@ -62,35 +63,41 @@ char *get_open_elf_name() {
 
 char *get_open_function_flag() {
     init_sdk_init();
-    if (is_arm_64()) {
-        if (is_pie() || is_q()) {
-            return "_ZN3art13DexFileLoader10OpenCommonEPKhmS2_mRKNSt3__112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEjPKNS_10OatDexFileEbbPS9_NS3_10unique_ptrINS_16DexFileContainerENS3_14default_deleteISH_EEEEPNS0_12VerifyResultE";
-        }
-        if (is_oreo()) {
-            return "_ZN3art7DexFile10OpenCommonEPKhmRKNSt3__112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEjPKNS_10OatDexFileEbbPS9_PNS0_12VerifyResultE";
-        }
-        if (is_nougat() || is_marshmallow()) {
-            return "_ZN3art7DexFile10OpenMemoryEPKhmRKNSt3__112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEjPNS_6MemMapEPKNS_10OatDexFileEPS9_";
-        }
-    } else {
-        if (is_pie() || is_q()) {
-            return "_ZN3art13DexFileLoader10OpenCommonEPKhjS2_jRKNSt3__112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEjPKNS_10OatDexFileEbbPS9_NS3_10unique_ptrINS_16DexFileContainerENS3_14default_deleteISH_EEEEPNS0_12VerifyResultE";
-        }
-
-        if (is_oreo()) {
-            return "_ZN3art7DexFile10OpenCommonEPKhjRKNSt3__112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEjPKNS_10OatDexFileEbbPS9_PNS0_12VerifyResultE";
-        }
-
-        if (is_nougat() || is_marshmallow()) {
-            return "_ZN3art7DexFile10OpenMemoryEPKhjRKNSt3__112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEjPNS_6MemMapEPKNS_10OatDexFileEPS9_";
-        }
+#if defined(__aarch64__)
+    if (is_pie() || is_q()) {
+        return "_ZN3art13DexFileLoader10OpenCommonEPKhmS2_mRKNSt3__112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEjPKNS_10OatDexFileEbbPS9_NS3_10unique_ptrINS_16DexFileContainerENS3_14default_deleteISH_EEEEPNS0_12VerifyResultE";
     }
+    if (is_oreo()) {
+        return "_ZN3art7DexFile10OpenCommonEPKhmRKNSt3__112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEjPKNS_10OatDexFileEbbPS9_PNS0_12VerifyResultE";
+    }
+    if (is_nougat() || is_marshmallow()) {
+        return "_ZN3art7DexFile10OpenMemoryEPKhmRKNSt3__112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEjPNS_6MemMapEPKNS_10OatDexFileEPS9_";
+    }
+#elif defined(__arm__)
+    if (is_pie() || is_q()) {
+        return "_ZN3art13DexFileLoader10OpenCommonEPKhjS2_jRKNSt3__112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEjPKNS_10OatDexFileEbbPS9_NS3_10unique_ptrINS_16DexFileContainerENS3_14default_deleteISH_EEEEPNS0_12VerifyResultE";
+    }
+
+    if (is_oreo()) {
+        return "_ZN3art7DexFile10OpenCommonEPKhjRKNSt3__112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEjPKNS_10OatDexFileEbbPS9_PNS0_12VerifyResultE";
+    }
+
+    if (is_nougat() || is_marshmallow()) {
+        return "_ZN3art7DexFile10OpenMemoryEPKhjRKNSt3__112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEjPNS_6MemMapEPKNS_10OatDexFileEPS9_";
+    }
+#elif defined(__x86_64__) || defined(__x86_64)
+    if (is_pie() || is_q()) {
+        return "_ZN3art13DexFileLoader10OpenCommonEPKhmS2_mRKNSt3__112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEjPKNS_10OatDexFileEbbPS9_NS3_10unique_ptrINS_16DexFileContainerENS3_14default_deleteISH_EEEEPNS0_12VerifyResultE";
+    }
+#elif defined(__x86)
+
+#endif
     return "";
 }
 
 //64位
 /////////////////////
-#if defined(__LP64__) || defined(__aarch64__) || defined(__x86_64__) || defined(__x86_64)
+//#if defined(__LP64__) || defined(__aarch64__) || defined(__x86_64__) || defined(__x86_64) || defined(__arm__)
 static void *
 (*old_arm64_open_common)(uint8_t *, size_t, void *, uint32_t, void *, bool, bool, void *, void *);
 
@@ -114,7 +121,44 @@ static void *new_arm64_open_common(uint8_t *base, size_t size, void *location,
 }
 
 static void *
-(*old_arm64_q_open_common)(uint8_t *, size_t, const uint8_t *,
+(*old_arm64_q_open_common)(uint8_t *, size_t, const uint8_t *, size_t, void *,
+                           uint32_t, void *,
+                           bool,
+                           bool,
+                           void *,
+                           void *,
+                           void *);
+
+static void *
+new_arm64_q_open_common(uint8_t *base, size_t size, const uint8_t *data_base, size_t data_size,
+                        void *location, uint32_t location_checksum,
+                        void *oat_dex_file,
+                        bool verify,
+                        bool verify_checksum,
+                        void *error_msg,
+                        void *container,
+                        void *verify_result) {
+    LOGI("new_arm64_q_open_common enter");
+    LOGI("new_arm64_q_open_common base=%p, size=%u, data_base=%p, data_size=%u, location=%u, "
+         "location_checksum=%u, oat_dex_file=%u, verify=%u, verify_checksum=%u, DEX_MIN_LEN=%u", base, size,
+         data_base, data_size, location, location_checksum, oat_dex_file, verify, verify_checksum, DEX_MIN_LEN);
+    if (size < DEX_MIN_LEN) {
+        LOGE("size=%u", size);
+    } else {
+        save_dex_file(base, size);
+    }
+    return (*old_arm64_q_open_common)(base, size, data_base, data_size, location,
+                                           location_checksum,
+                                           oat_dex_file, verify, verify_checksum,
+                                           error_msg, container,
+                                           verify_result);
+    LOGI("new_arm64_q_open_common out");
+//    return result;
+//    return NULL;
+}
+
+static void *
+(*old_x64_q_open_common)(void *DexFile_thiz, uint8_t *, size_t, const uint8_t *,
                              size_t, void *,
                              uint32_t, void *,
                              bool,
@@ -122,10 +166,7 @@ static void *
                              void *,
                              void *,
                              void *);
-#define __make_rwx(p, n)           ::mprotect(__ptr_align(p), \
-                                                  __page_align(__uintval(p) + n) != __page_align(__uintval(p)) ? __page_align(n) + __page_size : __page_align(n), \
-                                                  PROT_READ | PROT_WRITE | PROT_EXEC)
-static void *new_arm64_q_open_common(uint8_t *base, size_t size, const uint8_t *data_base,
+static void *new_x64_q_open_common(void *DexFile_thiz, uint8_t *base, size_t size, const uint8_t *data_base,
                                        size_t data_size, void *location,
                                        uint32_t location_checksum, void *oat_dex_file,
                                        bool verify,
@@ -133,20 +174,23 @@ static void *new_arm64_q_open_common(uint8_t *base, size_t size, const uint8_t *
                                        void *error_msg,
                                        void *container,
                                        void *verify_result) {
-    LOGI("new_arm64_q_open_common base=%u, size=%u, location=%u, location_checksum=%u", base,
-         size, location, location_checksum);
+    LOGI("new_x64_q_open_common enter");
+    LOGI("new_x64_q_open_common DexFile_thiz=%p, base=%p, size=%u, data_base=%p, data_size=%u, location=%u, "
+         "location_checksum=%u, oat_dex_file=%u, verify=%u, verify_checksum=%u", DexFile_thiz, base, size,
+         data_base, data_size, location, location_checksum, oat_dex_file, verify, verify_checksum);
     if (size < DEX_MIN_LEN) {
         LOGE("size=%u", size);
     } else {
         save_dex_file(base, size);
     }
-//    void *result = old_arm64_q_open_common(base, size, data_base, data_size, location,
-//                                         location_checksum,
-//                                         oat_dex_file, verify, verify_checksum,
-//                                         error_msg, container,
-//                                         verify_result);
+    return (*old_x64_q_open_common)(DexFile_thiz, base, size, data_base, data_size, location,
+                                         location_checksum,
+                                         oat_dex_file, verify, verify_checksum,
+                                         error_msg, container,
+                                         verify_result);
+    LOGI("new_x64_q_open_common out");
 //    return result;
-    return NULL;
+//    return NULL;
 }
 /////////////////////
 
@@ -175,7 +219,7 @@ static void *
 /////////////////////
 
 //32位
-#else
+//#else
 
 /////////////////////
 static void *
@@ -266,17 +310,23 @@ static void *(new_pie_open_memory)(void *DexFile_thiz,
                                   container,
                                   verify_result);
 }
-#endif
+//#endif
 
 void **get_old_open_function_addr() {
 #if defined(__LP64__) || defined(__aarch64__) || defined(__x86_64__) || defined(__x86_64)
         if (is_oreo()) {
             return reinterpret_cast<void **>(&old_arm64_open_common);
         } else if(is_q()) {
-            return reinterpret_cast<void **>(&old_arm64_q_open_common);
+            if (is_arm_64()) {
+                return reinterpret_cast<void **>(&old_arm64_q_open_common);
+            } else {
+                return reinterpret_cast<void **>(&old_x64_q_open_common);
+            }
         } else {
             return reinterpret_cast<void **>(&old_arm64_open_memory);
         }
+#elif defined(__arm__)
+    return reinterpret_cast<void **>(old_x64_q_open_common);
 #else
         if (is_oreo()) {
             return reinterpret_cast<void **>(&old_opencommon);
@@ -295,19 +345,23 @@ void *get_new_open_function_addr() {
 #if defined(__LP64__) || defined(__aarch64__) || defined(__x86_64__) || defined(__x86_64)
         if (is_oreo()) {
             return reinterpret_cast<void *>(new_arm64_open_common);
-        } else if(is_q()) {
-            return reinterpret_cast<void *>(new_arm64_q_open_common);
-        } else {
-            return reinterpret_cast<void *>(new_arm64_open_memory);
-        }
-#else
-        if (is_oreo()) {
-            return reinterpret_cast<void *>(new_opencommon);
-        } else {
-            if (is_pie() || is_q()) {
-                return reinterpret_cast<void *>(new_pie_open_memory);
+        } else if (is_q()) {
+            if (is_arm_64()) {
+                return reinterpret_cast<void **>(&new_arm64_q_open_common);
+            } else {
+                return reinterpret_cast<void *>(new_x64_q_open_common);
             }
-            return reinterpret_cast<void *>(new_nougat_open_memory);
         }
+//        else if (is_oreo()) {
+//            return reinterpret_cast<void *>(new_opencommon);
+//        } else {
+//            if (is_pie() || is_q()) {
+//                return reinterpret_cast<void *>(new_pie_open_memory);
+//            }
+//            return reinterpret_cast<void *>(new_nougat_open_memory);
+//        }
+#elif defined(__arm__)
+    return reinterpret_cast<void *>(new_x64_q_open_common);
 #endif
+    return NULL;
 }

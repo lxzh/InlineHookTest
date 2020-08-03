@@ -582,7 +582,7 @@ A64_JNIEXPORT void A64HookFunction(void *const symbol, void *const replace, void
     void *trampoline = NULL;
     A64_LOGI("A64HookFunction -> 1");
     if (result != NULL) {
-        A64_LOGI("A64HookFunction symbol=%p replace=%p result=%p", symbol, replace, *result);
+        A64_LOGI("A64HookFunction symbol=%p replace=%p result=%p", symbol, replace, result);
     } else {
         A64_LOGI("A64HookFunction symbol=%p replace=%p", symbol, replace);
     }

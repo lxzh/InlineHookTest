@@ -6,7 +6,7 @@ website: ele7enxxh.com
 modified time: 2016-10-17
 created time: 2015-01-17
 */
-#include "util/common.h"
+#include "../util/common.h"
 #include "relocate.h"
 
 #define ALIGN_PC(pc)    (pc & 0xFFFFFFFC)

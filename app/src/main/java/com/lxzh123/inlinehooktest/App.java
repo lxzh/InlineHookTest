@@ -5,7 +5,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.geetest.shell.Core;
-import com.lxzh123.hooker.XHooker;
+//import com.lxzh123.hooker.XHooker;
 
 public class App extends Application {
 
@@ -16,8 +16,8 @@ public class App extends Application {
         super.attachBaseContext(base);
         mContext = this;
         Log.d("DumpDex", "MainActivity onCreate");
-//        Hooker.hook();
-        Hooker.dump("com.lxzh123.inlinehooktest");
+        Hooker.hook();
+//        Hooker.dump("com.lxzh123.inlinehooktest");
 //        XHooker.getInstance().start();
     }
 
@@ -38,6 +38,7 @@ public class App extends Application {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
+                Hooker.dump("com.lxzh123.inlinehooktest");
                 init();
             }
         }.start();
@@ -47,7 +48,7 @@ public class App extends Application {
         try {
             Log.i("DumpDex", "init start");
             Core.init(mContext);
-            XHooker.getInstance().refresh(true);
+//            XHooker.getInstance().refresh(true);
         } catch (Exception ex) {
             Log.e("DumpDex", "onCreate Exception ex=" + ex.getMessage());
             ex.printStackTrace();

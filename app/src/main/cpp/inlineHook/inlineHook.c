@@ -7,6 +7,8 @@ modified time: 2015-01-23
 created time: 2015-11-30
 */
 
+#ifdef __arm__
+
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
@@ -19,7 +21,7 @@ created time: 2015-11-30
 #include <arm-linux-androideabi/asm/ptrace.h>
 #include <android/log.h>
 
-#include "util/common.h"
+#include "../util/common.h"
 #include "relocate.h"
 #include "inlineHook.h"
 
@@ -415,3 +417,4 @@ void inlineHookAll() {
 
     unFreeze(pid);
 }
+#endif

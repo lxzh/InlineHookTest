@@ -18,11 +18,16 @@ add_library( # Sets the name of the library.
 
              # Provides a relative path to your source file(s).
              native.cpp
+             test_class.cpp
              dlopen.c
              fake_dlfcn.cpp
-             inlineHook.c
-             relocate.c
-             And64InlineHook.cpp
+             inlineHook/inlineHook.c
+             inlineHook/relocate.c
+             A64InlineHook/And64InlineHook.cpp
+             Substrate/hde64.c
+             Substrate/SubstrateDebug.cpp
+             Substrate/SubstrateHook.cpp
+             Substrate/SubstratePosixMemory.cpp
              util/deviceutils.cpp
              util/fileutils.cpp)
 

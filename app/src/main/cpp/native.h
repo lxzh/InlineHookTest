@@ -14,12 +14,6 @@
 #include "util/deviceutils.h"
 #include "util/fileutils.h"
 
-#if defined(__LP64__) || defined(__aarch64__) || defined(__x86_64__) || defined(__x86_64)
-#include "And64InlineHook.hpp"
-#else
-#include "inlineHook.h"
-#endif
-
 #ifndef _Included_com_lxzh123_inlinehooktest_Hooker
 #define _Included_com_lxzh123_inlinehooktest_Hooker
 #ifdef __cplusplus

@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.geetest.libcore.LIB;
-import com.lxzh123.hooker.XHooker;
+//import com.lxzh123.hooker.XHooker;
 
 public class MainActivity extends AppCompatActivity {
     TextView textView,textView1;
