@@ -517,14 +517,14 @@ A64_JNIEXPORT void *A64HookFunctionV(void *const symbol, void *const replace,
     auto pc_offset = static_cast<int64_t>(__intval(replace) - __intval(symbol)) >> 2;
     if (llabs(pc_offset) >= (mask >>1)) {
         int32_t count = (reinterpret_cast<uint64_t>(original + 2) & 7u) != 0u ? 5 : 4;
-        A64_LOGI("A64HookFunctionV count=%u", count);
-        long pagesize = sysconf(_SC_PAGESIZE);
-        unsigned alignment = (unsigned)((unsigned long long)original % pagesize);
-        A64_LOGI("A64HookFunctionV munprotect page size: %d, alignment: %d", pagesize, alignment);
-        if (__make_rwx(original, 5 * sizeof(uint32_t)) != 0) {
-            A64_LOGE("A64HookFunctionV mprotect failed: %s (%d)", strerror(errno), errno);
-            return NULL;
-        }
+//        A64_LOGI("A64HookFunctionV count=%u", count);
+//        long pagesize = sysconf(_SC_PAGESIZE);
+//        unsigned alignment = (unsigned)((unsigned long long)original % pagesize);
+//        A64_LOGI("A64HookFunctionV mprotect page size: %d, alignment: %d", pagesize, alignment);
+//        if (__make_rwx(original, 5 * sizeof(uint32_t)) != 0) {
+//            A64_LOGE("A64HookFunctionV mprotect failed: %s (%d)", strerror(errno), errno);
+//            return NULL;
+//        }
 
         if (trampoline) {
             if (rwx_size < count * 10u) {
@@ -547,8 +547,8 @@ A64_JNIEXPORT void *A64HookFunctionV(void *const symbol, void *const replace,
             A64_LOGI("inline hook %p->%p successfully! %zu bytes overwritten",
                      symbol, replace, 5 * sizeof(uint32_t));
         } else {
-            A64_LOGE("mprotect failed with errno = %d, p = %p, size = %zu",
-                     errno, original, 5 * sizeof(uint32_t));
+//            A64_LOGE("mprotect failed with errno = %d, p = %p, size = %zu",
+//                     errno, original, 5 * sizeof(uint32_t));
             trampoline = NULL;
         } //if
     } else {
@@ -567,8 +567,8 @@ A64_JNIEXPORT void *A64HookFunctionV(void *const symbol, void *const replace,
             A64_LOGI("inline hook %p->%p successfully! %zu bytes overwritten",
                      symbol, replace, 1 * sizeof(uint32_t));
         } else {
-            A64_LOGE("mprotect failed with errno = %d, p = %p, size = %zu",
-                     errno, original, 1 * sizeof(uint32_t));
+//            A64_LOGE("mprotect failed with errno = %d, p = %p, size = %zu",
+//                     errno, original, 1 * sizeof(uint32_t));
             trampoline = NULL;
         } //if
     } //if

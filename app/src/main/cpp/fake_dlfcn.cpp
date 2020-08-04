@@ -231,7 +231,8 @@ static void *fake_dlsym(void *handle, const char *name) {
     Elf_Sym *sym = (Elf_Sym *) ctx->dynsym;
     char *strings = (char *) ctx->dynstr;
 
-    for (k = 0; k < ctx->nsyms; k++, sym++)
+    for (k = 0; k < ctx->nsyms; k++, sym++) {
+//        LOGI("fake_dlsym k=%u, addr=%p st_name=%s", k, sym, strings + sym->st_name);
         if (strcmp(strings + sym->st_name, name) == 0) {
             /*  NB: sym->st_value is an offset into the section for relocatables,
             but a VMA for shared libs or exe files, so we have to subtract the bias */
@@ -239,6 +240,7 @@ static void *fake_dlsym(void *handle, const char *name) {
             LOGI("%s found at %p", name, ret);
             return ret;
         }
+    }
     return 0;
 }
 

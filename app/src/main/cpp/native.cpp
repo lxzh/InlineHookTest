@@ -218,73 +218,27 @@ JNIEXPORT void JNICALL hook(JNIEnv *env, jclass obj) {
     LOGD("hook init complete");
     is_hook = true;
 }
-
-#ifdef __aarch64__
-void *(*old_q_open_common)(uint8_t *, size_t, const uint8_t *,
-                         size_t, void *,
-                         uint32_t, void *,
+void *
+(*old_q_open_with_magic)(void *, uint32_t, int, void *,
                          bool,
                          bool,
-                         void *,
                          void *,
                          void *);
-void *new_q_open_common(uint8_t *base, size_t size, const uint8_t *data_base,
-                                   size_t data_size, void *location,
-                                   uint32_t location_checksum, void *oat_dex_file,
-                                   bool verify,
-                                   bool verify_checksum,
-                                   void *error_msg,
-                                   void *container,
-                                   void *verify_result) {
-    LOGI("new_q_open_common enter");
-    LOGI("new_q_open_common base=%p, size=%p, data_base=%p, data_size=%u, location=%p, "
-         "location_checksum=%u, oat_dex_file=%u, verify=%u, verify_checksum=%u", base, size,
-         data_base, data_size, location, location_checksum, oat_dex_file, verify, verify_checksum);
-//    if (size < 1024) {
-//        LOGE("size=%u", size);
-//    } else {
-//        save_dex_file(base, size);
-//    }
-    return old_q_open_common(base, size, data_base, data_size, location,
-                                    location_checksum,
-                                    oat_dex_file, verify, verify_checksum,
-                                    error_msg, container,
-                                    verify_result);
+
+void *new_q_open_with_magic(void *ArtDexFile_this, uint32_t magic, int fd,
+                            void *location,
+                            bool verify,
+                            bool verify_checksum,
+                            void *error_msg,
+                            void *dex_files) {
+    LOGI("new_q_open_with_magic2 enter");
+    LOGI("new_q_open_with_magic2 ArtDexFile_this=%p, magic=%u, fd=%p, data_base=%p, location=%s, "
+         "location_checksum=%u, oat_dex_file=%u, verify=%u, verify_checksum=%u", ArtDexFile_this,
+         magic, fd,
+         location, verify, verify_checksum);
+    return old_q_open_with_magic(ArtDexFile_this, magic, fd, location, verify, verify_checksum,
+                                 error_msg, dex_files);
 }
-#else
-void *
-(*old_q_open_common)(void *DexFile_thiz, uint8_t *, size_t, const uint8_t *,
-                             size_t, void *,
-                             uint32_t, void *,
-                             bool,
-                             bool,
-                             void *,
-                             void *,
-                             void *);
-void *new_q_open_common(void *DexFile_thiz, uint8_t *base, size_t size, const uint8_t *data_base,
-                                       size_t data_size, void *location,
-                                       uint32_t location_checksum, void *oat_dex_file,
-                                       bool verify,
-                                       bool verify_checksum,
-                                       void *error_msg,
-                                       void *container,
-                                       void *verify_result) {
-    LOGI("new_q_open_common enter");
-    LOGI("new_q_open_common DexFile_thiz=%p, base=%p, size=%p, data_base=%p, data_size=%u, location=%p, "
-         "location_checksum=%u, oat_dex_file=%u, verify=%u, verify_checksum=%u", DexFile_thiz, base, size,
-         data_base, data_size, location, location_checksum, oat_dex_file, verify, verify_checksum);
-//    if (size < 1024) {
-//        LOGE("size=%u", size);
-//    } else {
-//        save_dex_file(base, size);
-//    }
-    return old_q_open_common(DexFile_thiz, base, size, data_base, data_size, location,
-                                         location_checksum,
-                                         oat_dex_file, verify, verify_checksum,
-                                         error_msg, container,
-                                         verify_result);
-}
-#endif
 
 JNIEXPORT void JNICALL dump(JNIEnv *env, jclass obj, jstring packageName) {
     LOGD("hook start");
@@ -297,33 +251,34 @@ JNIEXPORT void JNICALL dump(JNIEnv *env, jclass obj, jstring packageName) {
     init_package_name(p);
     printPlatform();
     LOGD("hook start 1");
-//    ndk_init(env);
-//    void *handle = ndk_dlopen("libart.so", RTLD_NOW);
     char *elf_name = get_open_elf_name();
     void *handle = dlopen_ex(elf_name, RTLD_NOW);
     if (handle == NULL) {
         LOGD("Error: unable to find the SO : %s", elf_name);
         return;
     }
-    LOGD("dlopen libart.so success");
+    LOGD("dlopen %s success", elf_name);
 //    hookMagicValid(handle);
 //    hookTest();
 ///*
 //    void *open_common_addr = ndk_dlsym(handle, get_open_function_flag());
-    char *symbol_name = get_open_function_flag();
+    char *symbol_name = get_open_symbol_name();
     void *open_common_addr = dlsym_ex(handle, symbol_name);
     if (open_common_addr == NULL) {
         LOGD("Error: unable to find the Symbol:%s", symbol_name);
         return;
     }
     LOGD("loaded so finished, start hook");
-//    void *new_func_addr = get_new_open_function_addr();
-//    void **old_func_addr = get_old_open_function_addr();
-//    LOGD("hook new_func_addr=%p, old_func_addr=%p", new_func_addr, old_func_addr);
-//    hook_function(open_common_addr, new_func_addr, old_func_addr);
+    void *new_func_addr = get_new_open_addr();
+    void **old_func_addr = get_old_open_addr();
+    LOGD("hook new_func_addr=%p, old_func_addr=%p", new_func_addr, old_func_addr);
+    hook_function(open_common_addr, new_func_addr, old_func_addr);
 
-    hook_function(open_common_addr, (void *)new_q_open_common, (void **)&old_q_open_common);
-    printMaps();
+//    hook_function(open_common_addr, (void *)new_q_open_common, (void **)&old_q_open_common);
+
+//    void *open_with_magic_addr = dlsym_ex(handle, "tDexFileLoader13OpenWithMagicEjiRKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEbbPS7_PNS1_6vectorINS1_10unique_ptrIKNS_7DexFileENS1_14default_deleteISE_EEEENS5_ISH_EEEE");
+//    hook_function(open_common_addr, (void *)new_q_open_with_magic, (void **)&old_q_open_with_magic);
+//    printMaps();
 
     LOGD("hook init complete");
     is_hook = true;
